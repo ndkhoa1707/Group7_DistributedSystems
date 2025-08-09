@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Web-to-Web P2P Chat</title>
+</head>
+<body>
+    <h2>Distributed systems - Group 7</h2>
+
+    <input id="username" type="text" placeholder="Enter your name" style="width: 200px;" />
+    <br><br>
+
+    <div id="chat" style="height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px;"></div>
+    <input id="messageInput" type="text" placeholder="Type a message..." style="width: 80%;">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+    const chatBox = document.getElementById("chat");
+    const messageInput = document.getElementById("messageInput");
+    const usernameInput = document.getElementById("username");
+
+    const ws = new WebSocket("ws://localhost:8080/ws");
+
+    ws.onmessage = (event) => {
+        const msg = JSON.parse(event.data);
+        const div = document.createElement("div");
+        div.textContent = `💬 ${msg.name}: ${msg.message}`;
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    };
+
+    function sendMessage() {
+        const name = usernameInput.value.trim();
+        const message = messageInput.value.trim();
+        if (name && message) {
+        const json = JSON.stringify({ name: name, message: message });
+        ws.send(json);
+        messageInput.value = "";
+        }
+    }
+    </script>
+</body>
+</html>
